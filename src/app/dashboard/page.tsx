@@ -33,32 +33,34 @@ export default function DashboardPage() {
       return
     }
 
-    fetchDashboardData()
+    const fetchData = async () => {
+      if (!session?.user?.id) return
+
+      try {
+        // ユーザーの商品数を取得
+        const { count: productCount } = await supabase
+          .from('products')
+          .select('*', { count: 'exact', head: true })
+          .eq('seller_id', session.user.id)
+
+        // 注文データを取得（仮のデータ）
+        setStats({
+          totalProducts: productCount || 0,
+          totalSales: 23, // 仮データ
+          totalRevenue: 156780, // 仮データ
+          totalOrders: 45 // 仮データ
+        })
+      } catch (dashboardError) {
+        console.error('Dashboard data fetch error:', dashboardError)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchData()
   }, [session, status, router])
 
-  const fetchDashboardData = async () => {
-    if (!session?.user?.id) return
-
-    try {
-      // ユーザーの商品数を取得
-      const { count: productCount } = await supabase
-        .from('products')
-        .select('*', { count: 'exact', head: true })
-        .eq('seller_id', session.user.id)
-
-      // 注文データを取得（仮のデータ）
-      setStats({
-        totalProducts: productCount || 0,
-        totalSales: 23, // 仮データ
-        totalRevenue: 156780, // 仮データ
-        totalOrders: 45 // 仮データ
-      })
-    } catch (error) {
-      console.error('Dashboard data fetch error:', error)
-    } finally {
-      setLoading(false)
-    }
-  }
+  // fetchDashboardData関数を削除（useEffect内に統合）
 
   if (status === 'loading' || loading) {
     return (

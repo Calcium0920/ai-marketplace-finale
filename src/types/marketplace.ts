@@ -273,14 +273,14 @@ export interface Notification {
 }
 
 // 🎯 API レスポンス関連
-export interface ApiResponse<T = any> {
+export interface ApiResponse<T = unknown> {
   success: boolean
   data?: T
   error?: string
   message?: string
 }
 
-export interface PaginatedResponse<T = any> {
+export interface PaginatedResponse<T = unknown> {
   data: T[]
   pagination: {
     page: number
@@ -295,8 +295,8 @@ export interface AuthUser {
   id: string
   email: string
   email_verified: boolean
-  user_metadata: any
-  app_metadata: any
+  user_metadata: Record<string, unknown>
+  app_metadata: Record<string, unknown>
   created_at: string
   updated_at: string
 }

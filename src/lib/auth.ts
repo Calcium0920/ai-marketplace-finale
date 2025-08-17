@@ -40,7 +40,8 @@ export const authOptions: NextAuthOptions = {
             name: data.user.user_metadata?.full_name || data.user.email,
             image: data.user.user_metadata?.avatar_url,
           }
-        } catch (error) {
+        } catch (authError) {
+          console.error('Auth error:', authError)
           return null
         }
       }
@@ -91,7 +92,7 @@ export const authOptions: NextAuthOptions = {
       }
       return token
     },
-    async signIn({ user, account, profile }) {
+    async signIn({ user, account }) {
       if (account?.provider === 'google' || account?.provider === 'github') {
         try {
           // プロファイル自動作成
@@ -107,8 +108,8 @@ export const authOptions: NextAuthOptions = {
           if (error) {
             console.error('Profile creation error:', error)
           }
-        } catch (error) {
-          console.error('Sign in error:', error)
+        } catch (signInError) {
+          console.error('Sign in error:', signInError)
         }
       }
       return true
