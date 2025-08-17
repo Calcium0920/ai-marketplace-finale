@@ -3,7 +3,6 @@
 
 import { useState } from 'react'
 import { signIn } from 'next-auth/react'
-import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Header from '@/components/layout/Header'
 import { supabase } from '@/lib/supabase'
@@ -18,7 +17,6 @@ export default function RegisterPage() {
   })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
-  const router = useRouter()
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -75,6 +73,7 @@ export default function RegisterPage() {
 
         if (profileError) {
           console.error('Profile creation error:', profileError)
+          // プロファイル作成エラーはログのみ、処理続行
         }
 
         // 自動ログイン
@@ -84,7 +83,8 @@ export default function RegisterPage() {
           callbackUrl: '/dashboard'
         })
       }
-    } catch (error) {
+    } catch (signUpError) {
+      console.error('Account creation error:', signUpError)
       setError('アカウント作成に失敗しました')
     } finally {
       setLoading(false)
