@@ -1,13 +1,17 @@
 // src/app/page.tsx - プロ級美しいデザイン
+'use client'
+
 import Header from '@/components/layout/Header'
+import { SessionProvider } from 'next-auth/react'
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen w-full">
-      <Header />
-      
-      {/* 🎯 ヒーローセクション - 完全中央配置 */}
-      <section className="min-h-screen flex items-center justify-center px-4 py-20 relative overflow-hidden force-center">
+    <SessionProvider>
+      <div className="min-h-screen w-full">
+        <Header />
+        
+        {/* 🎯 ヒーローセクション - 完全中央配置 */}
+        <section className="min-h-screen flex items-center justify-center px-4 py-20 relative overflow-hidden force-center">
         {/* 🌟 背景装飾 */}
         <div className="absolute inset-0 bg-gradient-to-br from-blue-50 via-white to-indigo-50"></div>
         <div className="absolute top-20 left-10 w-72 h-72 bg-blue-200 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-float"></div>
@@ -143,5 +147,6 @@ export default function HomePage() {
         </div>
       </section>
     </div>
+    </SessionProvider>
   )
 }

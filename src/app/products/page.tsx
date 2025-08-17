@@ -1,4 +1,7 @@
 // src/app/products/page.tsx
+'use client'
+
+import { SessionProvider } from 'next-auth/react'
 import Header from '@/components/layout/Header'
 
 // 🎯 サンプル商品データ
@@ -117,7 +120,8 @@ function ProductCard({ product }: { product: typeof sampleProducts[0] }) {
 
 export default function ProductsPage() {
   return (
-    <div className="min-h-screen bg-gray-50">
+    <SessionProvider>
+      <div className="min-h-screen bg-gray-50">
       <Header />
       
       {/* 🎯 ヘッダースペーサー */}
@@ -189,5 +193,6 @@ export default function ProductsPage() {
         </div>
       </section>
     </div>
+    </SessionProvider>
   )
 }

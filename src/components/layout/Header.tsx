@@ -2,10 +2,18 @@
 'use client'
 
 import { useState } from 'react'
+import { useSession, signOut } from 'next-auth/react'
 import Link from 'next/link'
+import Image from 'next/image'
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false)
+  const { data: session, status } = useSession()
+
+  const handleSignOut = async () => {
+    await signOut({ callbackUrl: '/' })
+  }
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-lg border-b border-gray-200">
@@ -35,14 +43,98 @@ export default function Header() {
             </Link>
           </nav>
 
-          {/* 🔘 アクションボタン */}
+          {/* 🔘 認証エリア */}
           <div className="hidden md:flex items-center space-x-4">
-            <button className="text-gray-600 hover:text-blue-600 font-medium transition-colors">
-              ログイン
-            </button>
-            <button className="px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg font-semibold hover-glow">
-              無料登録
-            </button>
+            {status === 'loading' ? (
+              <div className="w-8 h-8 bg-gray-200 rounded-full animate-pulse"></div>
+            ) : session ? (
+              // ログイン済み
+              <div className="relative">
+                <button
+                  onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+                  className="flex items-center space-x-3 hover:bg-gray-100 rounded-lg px-3 py-2 transition-colors"
+                >
+                  {session.user.image ? (
+                    <Image
+                      src={session.user.image}
+                      alt="Profile"
+                      width={32}
+                      height={32}
+                      className="rounded-full"
+                    />
+                  ) : (
+                    <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-full flex items-center justify-center">
+                      <span className="text-white text-sm font-bold">
+                        {session.user.name?.charAt(0) || session.user.email?.charAt(0)}
+                      </span>
+                    </div>
+                  )}
+                  <span className="text-sm font-medium text-gray-700">
+                    {session.user.name || session.user.email}
+                  </span>
+                  <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+
+                {/* ユーザーメニュー */}
+                {isUserMenuOpen && (
+                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1">
+                    <Link
+                      href="/dashboard"
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      onClick={() => setIsUserMenuOpen(false)}
+                    >
+                      📊 ダッシュボード
+                    </Link>
+                    <Link
+                      href="/profile"
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      onClick={() => setIsUserMenuOpen(false)}
+                    >
+                      👤 プロフィール
+                    </Link>
+                    <Link
+                      href="/orders"
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      onClick={() => setIsUserMenuOpen(false)}
+                    >
+                      🛒 注文履歴
+                    </Link>
+                    <Link
+                      href="/sell"
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      onClick={() => setIsUserMenuOpen(false)}
+                    >
+                      💼 出品管理
+                    </Link>
+                    <hr className="my-1" />
+                    <button
+                      onClick={handleSignOut}
+                      className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50"
+                    >
+                      🚪 ログアウト
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              // 未ログイン
+              <>
+                <Link
+                  href="/auth/login"
+                  className="text-gray-600 hover:text-blue-600 font-medium transition-colors"
+                >
+                  ログイン
+                </Link>
+                <Link
+                  href="/auth/register"
+                  className="px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg font-semibold hover-glow"
+                >
+                  無料登録
+                </Link>
+              </>
+            )}
           </div>
 
           {/* 📱 モバイルメニューボタン */}
@@ -74,13 +166,57 @@ export default function Header() {
               <Link href="/about" className="block px-3 py-2 text-gray-600 hover:text-blue-600 font-medium">
                 About
               </Link>
+              
+              {/* モバイル認証エリア */}
               <div className="border-t border-gray-200 pt-4">
-                <Link href="/login" className="block px-3 py-2 text-gray-600 hover:text-blue-600 font-medium">
-                  ログイン
-                </Link>
-                <Link href="/register" className="block px-3 py-2 text-blue-600 font-semibold">
-                  無料登録
-                </Link>
+                {session ? (
+                  <>
+                    <div className="px-3 py-2 flex items-center space-x-3">
+                      {session.user.image ? (
+                        <Image
+                          src={session.user.image}
+                          alt="Profile"
+                          width={32}
+                          height={32}
+                          className="rounded-full"
+                        />
+                      ) : (
+                        <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-full flex items-center justify-center">
+                          <span className="text-white text-sm font-bold">
+                            {session.user.name?.charAt(0) || session.user.email?.charAt(0)}
+                          </span>
+                        </div>
+                      )}
+                      <span className="text-sm font-medium text-gray-700">
+                        {session.user.name || session.user.email}
+                      </span>
+                    </div>
+                    <Link href="/dashboard" className="block px-3 py-2 text-gray-600 hover:text-blue-600 font-medium">
+                      📊 ダッシュボード
+                    </Link>
+                    <Link href="/profile" className="block px-3 py-2 text-gray-600 hover:text-blue-600 font-medium">
+                      👤 プロフィール
+                    </Link>
+                    <Link href="/orders" className="block px-3 py-2 text-gray-600 hover:text-blue-600 font-medium">
+                      🛒 注文履歴
+                    </Link>
+                    <button
+                      onClick={handleSignOut}
+                      className="block w-full text-left px-3 py-2 text-red-600 hover:text-red-700 font-medium"
+                    >
+                      🚪 ログアウト
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <Link href="/auth/login" className="block px-3 py-2 text-gray-600 hover:text-blue-600 font-medium">
+                      ログイン
+                    </Link>
+                    <Link href="/auth/register" className="block px-3 py-2 text-blue-600 font-semibold">
+                      無料登録
+                    </Link>
+                  </>
+                )}
               </div>
             </div>
           </div>
